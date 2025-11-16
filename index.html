@@ -2,10 +2,775 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>天天的个人网站</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的个人主页</title>
+    <meta name="description" content="欢迎来到我的个人空间">
+    
+    <!-- 引入marked.js用于解析Markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    
+    <!-- 引入highlight.js用于代码高亮 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
+    <style>
+        /* ==================== 基础样式重置 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ==================== CSS变量定义 ==================== */
+        :root {
+            --primary-color: #6366f1;      /* 主题色 */
+            --secondary-color: #8b5cf6;    /* 次要色 */
+            --accent-color: #ec4899;       /* 强调色 */
+            --bg-color: #0f172a;           /* 背景色 */
+            --surface-color: #1e293b;      /* 表面色 */
+            --text-primary: #f1f5f9;       /* 主文字色 */
+            --text-secondary: #94a3b8;     /* 次要文字色 */
+            --border-color: #334155;       /* 边框色 */
+        }
+
+        /* ==================== 全局样式 ==================== */
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ==================== 动态背景 ==================== */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+
+        /* 背景动画圆点 */
+        .background-animation::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -250px;
+            right: -250px;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .background-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -200px;
+            left: -200px;
+            animation: float 15s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(50px, 50px); }
+        }
+
+        /* ==================== 导航栏 ==================== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* ==================== 主容器 ==================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem 2rem;
+        }
+
+        /* ==================== 首页Hero区域 ==================== */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            margin: 0 auto 2rem;
+            box-shadow: 0 20px 50px rgba(99, 102, 241, 0.3);
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .social-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .social-btn:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        /* ==================== 卡片网格 ==================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* ==================== 博客文章列表 ==================== */
+        .blog-list {
+            margin: 3rem 0;
+        }
+
+        .blog-item {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .blog-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(10px);
+        }
+
+        .blog-meta {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .blog-tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        /* ==================== Markdown内容样式 ==================== */
+        .markdown-content {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 3rem;
+            margin: 2rem 0;
+            line-height: 1.8;
+        }
+
+        .markdown-content h1,
+        .markdown-content h2,
+        .markdown-content h3 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content h1 {
+            font-size: 2.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .markdown-content h2 {
+            font-size: 2rem;
+        }
+
+        .markdown-content h3 {
+            font-size: 1.5rem;
+        }
+
+        .markdown-content p {
+            margin-bottom: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .markdown-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .markdown-content a:hover {
+            border-bottom-color: var(--primary-color);
+        }
+
+        .markdown-content code {
+            background: var(--bg-color);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+        }
+
+        .markdown-content pre {
+            background: var(--bg-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        .markdown-content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .markdown-content blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .markdown-content ul,
+        .markdown-content ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .markdown-content li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .markdown-content img {
+            max-width: 100%;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        /* ==================== 加载动画 ==================== */
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* ==================== 按钮样式 ==================== */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        /* ==================== 响应式设计 ==================== */
+        @media (max-width: 768px) {
+            .navbar-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .markdown-content {
+                padding: 1.5rem;
+            }
+        }
+
+        /* ==================== 动画效果 ==================== */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==================== 返回顶部按钮 ==================== */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 999;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+    </style>
 </head>
 <body>
-    <h1>你好，这是 tanhaotian.cn 的第一版主页 🎉</h1>
-    <p>这个页面是我在本地写完，通过 Git 推到服务器部署的。</p>
+    <!-- 动态背景 -->
+    <div class="background-animation"></div>
+
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">我的空间</div>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showHome()">首页</a></li>
+                <li><a href="#" onclick="showBlogs()">博客</a></li>
+                <li><a href="#" onclick="showProjects()">项目</a></li>
+                <li><a href="#" onclick="showAbout()">关于</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <div id="content">
+            <!-- 这里的内容会动态加载 -->
+        </div>
+    </div>
+
+    <!-- 返回顶部按钮 -->
+    <div class="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <script>
+        // ==================== 全局配置 ====================
+        
+        /**
+         * 配置对象 - 在这里修改你的个人信息和文章路径
+         * 所有的Markdown文件都应该放在 /content 目录下
+         */
+        const CONFIG = {
+            // 个人信息
+            name: '你的名字',
+            title: '前端开发者 / 设计师',
+            bio: '热爱编程与设计，致力于创造美好的数字体验',
+            
+            // 社交链接（可自定义）
+            social: {
+                github: 'https://github.com/yourusername',
+                email: 'mailto:your@email.com',
+                twitter: 'https://twitter.com/yourusername'
+            },
+            
+            // 博客文章配置 - 添加新文章时在这里添加
+            // path: 相对于根目录的Markdown文件路径
+            blogs: [
+                {
+                    id: 1,
+                    title: '我的第一篇博客',
+                    date: '2024-01-15',
+                    tags: ['技术', 'JavaScript'],
+                    description: '这是我的第一篇技术博客，分享我的学习心得...',
+                    path: '/content/blog1.md'  // Markdown文件路径
+                },
+                {
+                    id: 2,
+                    title: 'CSS技巧分享',
+                    date: '2024-01-20',
+                    tags: ['CSS', '前端'],
+                    description: '分享一些实用的CSS技巧和最佳实践...',
+                    path: '/content/blog2.md'
+                }
+                // 在这里添加更多文章
+            ],
+            
+            // 项目配置
+            projects: [
+                {
+                    title: '项目一',
+                    description: '这是一个很酷的项目，使用了最新的技术栈...',
+                    icon: '🚀',
+                    link: '#'
+                },
+                {
+                    title: '项目二',
+                    description: '另一个有趣的项目，解决了实际问题...',
+                    icon: '💡',
+                    link: '#'
+                }
+                // 添加更多项目
+            ]
+        };
+
+        // ==================== Markdown处理 ====================
+        
+        /**
+         * 配置marked.js的渲染选项
+         */
+        marked.setOptions({
+            highlight: function(code, lang) {
+                // 如果指定了语言，使用highlight.js高亮
+                if (lang && hljs.getLanguage(lang)) {
+                    return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+            },
+            breaks: true,  // 支持GitHub风格的换行
+            gfm: true      // 启用GitHub Flavored Markdown
+        });
+
+        /**
+         * 加载并渲染Markdown文件
+         * @param {string} path - Markdown文件路径
+         * @returns {Promise<string>} 渲染后的HTML
+         */
+        async function loadMarkdown(path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) {
+                    throw new Error(`无法加载文件: ${path}`);
+                }
+                const markdown = await response.text();
+                return marked.parse(markdown);
+            } catch (error) {
+                console.error('加载Markdown失败:', error);
+                return `<p style="color: var(--accent-color);">加载内容失败: ${error.message}</p>`;
+            }
+        }
+
+        /**
+         * 显示Markdown内容
+         * @param {string} path - Markdown文件路径
+         */
+        async function showMarkdownContent(path) {
+            const content = document.getElementById('content');
+            content.innerHTML = '<div class="loading">加载中</div>';
+            
+            const html = await loadMarkdown(path);
+            content.innerHTML = `<div class="markdown-content">${html}</div>`;
+            
+            // 重新应用代码高亮
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        }
+
+        // ==================== 页面渲染函数 ====================
+        
+        /**
+         * 显示首页
+         */
+        function showHome() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="hero">
+                    <div class="hero-avatar">👨‍💻</div>
+                    <h1>${CONFIG.name}</h1>
+                    <p>${CONFIG.bio}</p>
+                    <div class="social-links">
+                        <a href="${CONFIG.social.github}" class="social-btn" target="_blank">G</a>
+                        <a href="${CONFIG.social.email}" class="social-btn">@</a>
+                        <a href="${CONFIG.social.twitter}" class="social-btn" target="_blank">T</a>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon">📝</div>
+                        <h3>技术博客</h3>
+                        <p>分享我的技术见解、学习笔记和开发经验</p>
+                        <button class="btn" onclick="showBlogs()" style="margin-top: 1rem;">查看博客</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">💼</div>
+                        <h3>项目展示</h3>
+                        <p>展示我的个人项目和开源贡献</p>
+                        <button class="btn" onclick="showProjects()" style="margin-top: 1rem;">查看项目</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-icon">👤</div>
+                        <h3>关于我</h3>
+                        <p>了解更多关于我的背景和技能</p>
+                        <button class="btn" onclick="showAbout()" style="margin-top: 1rem;">了解更多</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * 显示博客列表
+         */
+        function showBlogs() {
+            const content = document.getElementById('content');
+            const blogsHTML = CONFIG.blogs.map(blog => `
+                <div class="blog-item" onclick="showMarkdownContent('${blog.path}')">
+                    <div class="blog-meta">
+                        <span>📅 ${blog.date}</span>
+                        ${blog.tags.map(tag => `<span class="blog-tag">${tag}</span>`).join('')}
+                    </div>
+                    <h2>${blog.title}</h2>
+                    <p>${blog.description}</p>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <div class="hero" style="padding: 2rem 0;">
+                    <h1>📝 技术博客</h1>
+                    <p>分享我的学习心得和技术见解</p>
+                </div>
+                <div class="blog-list">
+                    ${blogsHTML}
+                </div>
+            `;
+        }
+
+        /**
+         * 显示项目页面
+         */
+        function showProjects() {
+            const content = document.getElementById('content');
+            const projectsHTML = CONFIG.projects.map(project => `
+                <div class="card">
+                    <div class="card-icon">${project.icon}</div>
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <a href="${project.link}" class="btn" style="margin-top: 1rem;">查看详情</a>
+                </div>
+            `).join('');
+
+            content.innerHTML = `
+                <div class="hero" style="padding: 2rem 0;">
+                    <h1>💼 我的项目</h1>
+                    <p>这里是我的一些个人项目和作品</p>
+                </div>
+                <div class="cards-grid">
+                    ${projectsHTML}
+                </div>
+            `;
+        }
+
+        /**
+         * 显示关于页面
+         * 这里可以加载一个about.md文件，或者直接写HTML
+         */
+        function showAbout() {
+            // 方式1: 加载Markdown文件
+            showMarkdownContent('/content/about.md');
+            
+            // 方式2: 直接显示HTML内容（取消下面的注释使用）
+            /*
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="markdown-content">
+                    <h1>关于我</h1>
+                    <p>你好！我是${CONFIG.name}，${CONFIG.title}。</p>
+                    <h2>技能</h2>
+                    <ul>
+                        <li>前端开发</li>
+                        <li>UI/UX设计</li>
+                        <li>后端开发</li>
+                    </ul>
+                    <h2>联系方式</h2>
+                    <p>Email: <a href="${CONFIG.social.email}">your@email.com</a></p>
+                </div>
+            `;
+            */
+        }
+
+        // ==================== 工具函数 ====================
+        
+        /**
+         * 返回顶部
+         */
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        /**
+         * 监听滚动事件，显示/隐藏返回顶部按钮
+         */
+        window.addEventListener('scroll', () => {
+            const backToTop = document.querySelector('.back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        // ==================== 初始化 ====================
+        
+        /**
+         * 页面加载完成后显示首页
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            showHome();
+        });
+    </script>
 </body>
 </html>
